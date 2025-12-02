@@ -3,65 +3,92 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-
 const dataside = [
   {
-    id: 1, 
+    id: 1,
     href: "/dashboard/orders",
-    icon : "bi bi-box-seam",
-    name : "Orders"
+    icon: "bi bi-box-seam",
+    name: "Orders",
   },
   {
-    id:2,
+    id: 2,
     href: "/dashboard/services",
     icon: "bi bi-journals",
-    name: "service"
+    name: "Service",
   },
   {
-    id:3,
-    href:"/dashboard/report",
-    icon:"bi bi-graph-down",
-    name: "Report"
-  }
-]
+    id: 3,
+    href: "/dashboard/report",
+    icon: "bi bi-graph-down",
+    name: "Report",
+  },
+];
 
-const Sidebar = () => {
+const Sidebar = ({ className = "", onNavigate }) => {
   const pathname = usePathname();
 
   return (
-    // ⬇️ "hidden lg:flex" artinya sembunyikan di layar kecil, tampilkan di layar besar
-    <aside className="hidden lg:flex w-64 h-screen bg-[#001f3f] text-white flex-col transition-all duration-300 overflow-hidden">
-      <div className="bg-image-css px-6 py-6 border-b h-44 border-gray-700">
-        <h2 className="text-lg text-black font-semibold text-center mb-2"></h2>
+    <aside className={`w-72 min-h-screen bg-[#2D336B] text-white flex flex-col transition-all duration-300 overflow-hidden shadow-2xl ${className}`}>
+      <div className="relative bg-image-css px-6 py-6 border-b border-white/20 bg-gradient-to-b from-[#2D336B] to-[#1e234d] h-44">
+        
+        {onNavigate && (
+          <button
+            className="lg:hidden absolute top-4 right-4 text-white/70 hover:text-white"
+            onClick={onNavigate}
+            aria-label="Tutup sidebar"
+          >
+            <i className="bi bi-x-lg text-xl"></i>
+          </button>
+        )}
       </div>
 
-      <nav className="flex flex-col space-y-3 border-t border-gray-600 pt-4">
-        <h2 className="px-2 py-2 text-gray-400 uppercase text-sm">Utama</h2>
+      <nav className="flex flex-col space-y-3 border-t border-white/10 pt-6">
+        <h2 className="px-6 text-white/60 uppercase text-xs tracking-[0.2em]">
+          Utama
+        </h2>
+
+        {/* Dashboard */}
         <Link
           href="/dashboard"
-          className={`px-4 py-2 transition flex items-center gap-2 ${
-            pathname === "/dashboard"
-              ? "rounded-l-md ml-2 bg-white text-black font-semibold"
-              : ""
-          }`}
+          className={`px-6 py-3 flex items-center gap-3 transition rounded-r-full mr-6
+            ${
+              pathname === "/dashboard"
+                ? "bg-[#FFF2F2] text-[#2D336B] font-semibold shadow-md"
+                : "hover:bg-white/10 hover:translate-x-1"
+            }
+          `}
+          onClick={onNavigate}
         >
-          <i className="bi bi-house-door-fill"></i> Dashboard
+          <i className="bi bi-house-door-fill text-lg"></i>
+          Dashboard
         </Link>
 
-        <h2 className="px-2 py-2 text-gray-400 uppercase text-sm">Tabel Master</h2>
-        {dataside.map((u) => ( 
-        <Link
-          key={u.id}
-          href={u.href}
-          className={`px-4 py-2 transition flex items-center gap-2 ${
-            pathname === "/dashboard/pegawai"
-              ? "bg-gray-100 text-black font-semibold"
-              : ""
-          }`}
-        >
-          <i className={u.icon}></i> {u.name}
-        </Link>
-        ))}
+        {/* Master Menu */}
+        <h2 className="px-6 text-white/60 uppercase text-xs tracking-[0.2em]">
+          Tabel Master
+        </h2>
+
+        {dataside.map((item) => {
+          const isActive = pathname.startsWith(item.href);
+
+          return (
+            <Link
+              key={item.id}
+              href={item.href}
+              className={`px-6 py-3 flex items-center gap-3 transition rounded-r-full mr-6 text-base
+                ${
+                  isActive
+                    ? "bg-[#FFF2F2] text-[#2D336B] font-semibold shadow-md"
+                    : "hover:bg-white/10 hover:translate-x-1"
+                }
+              `}
+              onClick={onNavigate}
+            >
+              <i className={`${item.icon} text-lg`}></i>
+              {item.name}
+            </Link>
+          );
+        })}
       </nav>
     </aside>
   );

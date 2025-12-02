@@ -3,7 +3,7 @@ import OrderRecent from "../components/orders";
 import TableUser from "../components/user";
 
 export default async function DashboardPage() {
-  const { data: users, error } = await supabase.from("users").select("*")
+  const { data: users, error } = await supabase.from("m_customers").select("*")
 
   console.log("Data dari Supabase:", users)
   console.log("Error:", error)
@@ -13,11 +13,10 @@ export default async function DashboardPage() {
 
   return (
     <>
-      <div className="flex grid grid-cols-2 gap-4 ">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <OrderRecent />
         <TableUser />
       </div>
-
     </>
 
   )

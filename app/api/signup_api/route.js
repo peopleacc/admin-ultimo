@@ -25,7 +25,7 @@ export async function POST(req) {
 
     // 🔹 Ambil ID terakhir dari tabel User
     const { data: angka, error: errorSelect } = await supabase
-      .from("users")
+      .from("m_customers")
       .select("user_id")
       .order("user_id", { ascending: false })
       .limit(1);
@@ -40,8 +40,8 @@ export async function POST(req) {
 
     // 🔹 Simpan data ke Supabase
     const { data: users, error } = await supabase
-      .from("users")
-      .insert([{  email: email, password_hash: password, nama: name, no_hp: phone }]);
+      .from("m_customers")
+      .insert([{  email: email, password: password, nama: name, no_hp: phone }]);
 
     if (error) {
       console.error("❌ Supabase error:", error);

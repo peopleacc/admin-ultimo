@@ -2,122 +2,109 @@ import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabaseClient";
 import { randomUUID } from "crypto";
 
-// =======================
-// 🔹 LOGIN (POST)
-// =======================
 export async function POST(req) {
   try {
+    console.log("📥 [LOGIN] Request masuk");
+
     const { email, password } = await req.json();
+    console.log("📨 Body diterima:", { email, password });
 
     if (!email || !password) {
+      console.log("❌ Email atau password kosong");
       return NextResponse.json(
         { status: "error", message: "Email & password wajib diisi" },
         { status: 400 }
       );
     }
 
-    // 🔹 Cari user di Supabase
-    const { data: users, error } = await supabase
-      .from("users")
+    console.log("🔍 Mencari user di database...");
+    const { data: users, error: userErr } = await supabase
+      .from("m_customers")
       .select("*")
       .eq("email", email)
       .limit(1);
 
-    if (error || !users || users.length === 0)
-      return NextResponse.json({ status: "error", message: "User tidak ditemukan" });
+    if (userErr) {
+      console.log("❌ Error query database:", userErr);
+      return NextResponse.json(
+        { status: "error", message: "Gagal membaca database" },
+        { status: 500 }
+      );
+    }
+
+    console.log("🔍 Hasil pencarian:", users);
+
+    if (!users || users.length === 0) {
+      console.log("❌ User tidak ditemukan");
+      return NextResponse.json({
+        status: "error",
+        message: "Email tidak terdaftar",
+      });
+    }
 
     const user = users[0];
+    console.log("✅ User ditemukan:", user.email);
 
-    // 🔹 Cek password (plaintext; ganti bcrypt di produksi)
-    if (user.password_hash !== password)
-      return NextResponse.json({ status: "error", message: "Password salah" });
+    // 🔹 Cek password
+    console.log("🔐 Mengecek password...");
+    if (user.password !== password) {
+      console.log("❌ Password salah");
+      return NextResponse.json(
+        { status: "error", message: "Password salah" },
+        { status: 401 }
+      );
+    }
 
-    // 🔹 Buat session token
+    console.log("✅ Password benar");
+
+    // 🔹 Generate session
     const sessionToken = randomUUID();
+    console.log("🔑 Session token dibuat:", sessionToken);
 
-    // 🔹 Simpan session
-    await supabase.from("sessions").insert({
-      user_id: user.id,
-      email: user.email,
-      token: sessionToken,
-      created_at: new Date().toISOString(),
-    });
-
-    // 🔹 Response sukses
-    return NextResponse.json({
-      status: "success",
-      message: "Login berhasil",
-      session: sessionToken,
-      user: {
-        id: user.id,
-        nama: user.nama,
+    console.log("📝 Menyimpan session ke database...");
+    const { error: insertErr } = await supabase
+      .from("session")
+      .insert({
+        user_id: user.user_id,
         email: user.email,
+        token: sessionToken,
+        create_at: new Date().toISOString(),
+      })
+      .select();
+
+    if (insertErr) {
+      console.log("❌ Gagal insert session:", insertErr);
+      return NextResponse.json(
+        { status: "error", message: "Gagal membuat session" },
+        { status: 500 }
+      );
+    }
+
+    console.log("✅ Session berhasil disimpan!");
+
+    // 🔹 Sukses
+    console.log("🚀 Login sukses, mengirim response ke client");
+    return NextResponse.json(
+      {
+        status: "success",
+        message: "Login berhasil",
+        session: sessionToken,
+        user: {
+          id: user.user_id,
+          nama: user.nama,
+          email: user.email,
+          phone: user.no_hp,
+          alamat: user.address,
+
+        },
       },
-    });
+      { status: 200 }
+    );
   } catch (err) {
     console.error("💥 API Error:", err);
     return NextResponse.json(
       { status: "error", message: "Internal Server Error" },
       { status: 500 }
     );
-  }
-}
-
-// =======================
-// 🔹 GET SESSION (GET)
-// =======================
-export async function GET(req) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const token = searchParams.get("token");
-
-    if (!token) {
-      return NextResponse.json(
-        { status: "error", message: "Token tidak diberikan" },
-        { status: 400 }
-      );
-    }
-
-    // 🔹 Cek session
-    const { data: session, error: sessionError } = await supabase
-      .from("sessions")
-      .select("*")
-      .eq("token", token)
-      .single();
-
-    if (sessionError || !session) {
-      return NextResponse.json({
-        status: "error",
-        message: "Session tidak valid",
-      });
-    }
-
-    // 🔹 Ambil data user
-    const { data: users, error: userError } = await supabase
-      .from("users")
-      .select("user_id, nama, email, no_hp, password_hash")
-      .eq("email", session.email)
-      .limit(1);
-
-    if (userError || !users || users.length === 0) {
-      return NextResponse.json({
-        status: "error",
-        message: "User tidak ditemukan",
-      });
-    }
-
-    const user = users[0];
-
-    return NextResponse.json({
-      status: "success",
-      message: "Session valid",
-      user,
-    });
-  } catch (err) {
-    console.error("💥 Session GET Error:", err);
-    return NextResponse.json({
-      status: "error",
-      message: "Internal Server Error",
-    });
   }
 }

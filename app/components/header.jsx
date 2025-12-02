@@ -11,15 +11,15 @@ export default function Header({ onToggleSidebar }) {
   };
 
   return (
-    <header className="bg-gray-100 text-black m-4 py-4 shadow-lg rounded-xl">
+    <header className="m-4 rounded-3xl shadow-xl bg-gradient-to-r from-[#2D336B] to-[#4f5aa6] text-white px-6 py-5 border border-white/10">
       {/* ========================== BAGIAN ATAS HEADER ========================== */}
       <div className="flex items-center justify-between px-6">
         {/* Kiri: Tombol + Judul */}
         <div className="flex items-center space-x-4">
-          {/* Tombol Toggle Sidebar → hanya tampil di DESKTOP */}
+          {/* Tombol Toggle Sidebar → tampil di mobile */}
           <button
             onClick={onToggleSidebar}
-            className="bg-[#001f3f] hover:bg-blue-800 p-2 rounded-md focus:outline-none hidden lg:block"
+            className="bg-white/20 hover:bg-white/30 p-2 rounded-xl focus:outline-none lg:hidden transition"
             aria-label="Toggle sidebar"
           >
             <svg
@@ -38,7 +38,9 @@ export default function Header({ onToggleSidebar }) {
           </button>
 
           {/* Judul Halaman */}
-          <h1 className="text-xl font-semibold  hidden lg:block">Dashboard</h1>
+          <h1 className="text-2xl font-semibold tracking-wide hidden lg:block">
+            Dashboard
+          </h1>
         </div>
 
         {/* Link Header → hanya tampil di HP / tablet */}
@@ -47,8 +49,8 @@ export default function Header({ onToggleSidebar }) {
         </div>
 
         {/* Kanan: Menu User */}
-        <div className="relative flex items-center bg-[#001f3f] text-white rounded-xl px-4 py-2 mr-2">
-          <button className="text-white mr-3 pr-3 border-r border-white">
+        <div className="relative flex items-center bg-white/15 backdrop-blur-lg rounded-2xl px-4 py-2 mr-2 border border-white/20">
+          <button className="text-white mr-3 pr-3 border-r border-white/30">
             <BellFill size={18} />
           </button>
 
@@ -67,16 +69,16 @@ export default function Header({ onToggleSidebar }) {
 
           {/* Dropdown */}
           {isDropdownOpen && (
-            <div className="absolute right-0 top-14 w-40 bg-white border rounded-md shadow-lg z-10">
+            <div className="absolute right-0 top-14 w-44 bg-white border border-[#2D336B]/10 rounded-2xl shadow-2xl z-10 overflow-hidden">
               <a
                 href="#"
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                className="block px-4 py-2 text-sm text-[#2D336B] hover:bg-[#FFF2F2]"
               >
                 Setting
               </a>
               <a
                 href="/login"
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                className="block px-4 py-2 text-sm text-[#2D336B] hover:bg-[#FFF2F2]"
               >
                 Logout
               </a>
