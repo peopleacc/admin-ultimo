@@ -9,11 +9,25 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/lab": "^7.0.1-beta.18",
+    "@mui/material": "^7.3.4",
     "@supabase/supabase-js": "^2.78.0",
+    "@tabler/icons-react": "^3.35.0",
+    "apexcharts": "^5.3.6",
+    "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
+    "bootstrap-icons": "^1.13.1",
+    "flowbite-react": "^0.12.10",
+    "jspdf": "^3.0.4",
     "next": "16.0.1",
+    "pakage": "^1.0.0",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-apexcharts": "^1.8.0",
+    "react-bootstrap-icons": "^1.11.6",
+    "react-dom": "19.2.0",
+    "react-modal": "^3.16.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

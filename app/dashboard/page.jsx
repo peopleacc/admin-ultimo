@@ -1,7 +1,9 @@
 import { supabase } from "@/lib/supabaseClient"
+import OrderRecent from "../components/orders";
+import TableUser from "../components/user";
 
 export default async function DashboardPage() {
-  const { data: users, error } = await supabase.from("User").select("*")
+  const { data: users, error } = await supabase.from("m_customers").select("*")
 
   console.log("Data dari Supabase:", users)
   console.log("Error:", error)
@@ -10,13 +12,12 @@ export default async function DashboardPage() {
   if (!users?.length) return <div>Tidak ada data user.</div>
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">Daftar User</h1>
-      <ul>
-        {users.map((u) => (
-          <li key={u.id}>{u.email}</li>
-        ))}
-      </ul>
-    </div>
+    <>
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <OrderRecent />
+        <TableUser />
+      </div>
+    </>
+
   )
 }

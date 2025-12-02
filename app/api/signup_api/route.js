@@ -3,31 +3,31 @@ import { supabase } from "@/lib/supabaseClient";
 
 export async function POST(req) {
   try {
-    // 🔹 Baca isi body dari Android
-    const body = await req.text();
+    // 🔹 Baca body JSON dari Android
+    const body = await req.json();
     console.log("📩 Raw body dari Android:", body);
 
-    const params = new URLSearchParams(body);
-    const email = params.get("email");
-    const password = params.get("password");
+    const { email, password, name, phone } = body;
 
     console.log("📨 Data diterima dari Android:");
     console.log("   Email:", email);
     console.log("   Password:", password);
+    console.log("   Name:", name);
+    console.log("   Phone:", phone);
 
     // 🔹 Validasi input
-    if (!email || !password) {
+    if (!email || !password || !name || !phone) {
       return NextResponse.json(
-        { status: "error", message: "Email dan password wajib diisi" },
+        { status: "error", message: "Semua field wajib diisi" },
         { status: 400 }
       );
     }
 
-    // 🔹 Ambil ID terakhir dari tabel User (jika perlu manual)
+    // 🔹 Ambil ID terakhir dari tabel User
     const { data: angka, error: errorSelect } = await supabase
-      .from("User")
-      .select("id")
-      .order("id", { ascending: false })
+      .from("m_customers")
+      .select("user_id")
+      .order("user_id", { ascending: false })
       .limit(1);
 
     if (errorSelect) {
@@ -38,10 +38,10 @@ export async function POST(req) {
     const lastId = angka && angka.length > 0 ? angka[0].id : 0;
     const p_id = parseInt(lastId) + 1;
 
-    // 🔹 Simpan data baru ke tabel Supabase
+    // 🔹 Simpan data ke Supabase
     const { data: users, error } = await supabase
-      .from("User")
-      .insert([{ id: p_id, email: email, password: password }]); // jika id auto increment, hapus id
+      .from("m_customers")
+      .insert([{  email: email, password: password, nama: name, no_hp: phone }]);
 
     if (error) {
       console.error("❌ Supabase error:", error);
@@ -56,7 +56,6 @@ export async function POST(req) {
       message: "User berhasil disimpan",
       data: users,
     });
-    
   } catch (err) {
     console.error("💥 API Error:", err);
     return NextResponse.json(
@@ -64,9 +63,4 @@ export async function POST(req) {
       { status: 500 }
     );
   }
-}
-
-export async function GET() {
-  console.log("📡 Endpoint /api/login diakses melalui GET");
-  return NextResponse.json({ message: "Login API aktif ✅" });
 }
