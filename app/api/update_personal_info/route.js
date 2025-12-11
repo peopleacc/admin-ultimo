@@ -20,7 +20,7 @@ export async function GET(req) {
     // 🔹 Ambil data user dari Supabase berdasarkan token/session
     const { data: user, error } = await supabase
       .from("m_customers")
-      .select("user_id, nama, email, no_hp, address")
+      .select("user_id, nama, email, no_hp, address, foto_profile")
       .eq("email", email)  // Sesuaikan dengan nama kolom token di database
       .single();
 
@@ -44,6 +44,7 @@ export async function GET(req) {
         email: user.email,
         phone: user.no_hp,  // 🔹 Ubah ke 'phone' untuk Android
         address: user.address || null,
+        foto_profile: user.foto_profile || null,
       },
     });
   } catch (err) {
@@ -65,7 +66,7 @@ export async function POST(req) {
     const body = await req.json();
     console.log("📩 Raw body dari Android:", body);
 
-    const { nama, email, phone, address, password } = body;
+    const { nama, email, phone, address, password, foto_profile } = body;
 
     console.log("📨 Data diterima dari Android:");
     console.log("   Token (query):", token);
@@ -74,6 +75,7 @@ export async function POST(req) {
     console.log("   Email:", email);
     console.log("   Phone:", phone);
     console.log("   Address:", address);
+    console.log("   Address:", foto_profile);
 
     // 🔹 Validasi token
     if (!token && !body.token) {
@@ -115,10 +117,11 @@ export async function POST(req) {
         nama: nama,
         no_hp: phone,  // 🔹 Kolom database adalah no_hp
         address: address || null,
-        password: password || null
+        password: password || null,
+        foto_profile: foto_profile || null,
       })
       .eq("email", email)
-      .select("user_id, nama, email, no_hp, address, password")  // 🔹 Select no_hp dari database
+      .select("user_id, nama, email, no_hp, address, password, foto_profile")  // 🔹 Select no_hp dari database
       .single();
 
     if (error) {
