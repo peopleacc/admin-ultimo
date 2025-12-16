@@ -53,18 +53,18 @@ export default function Modalprog({ isOpen, onClose, order, onUpdated }) {
             let ket = "";
 
             if (current === 0) {
-                next = 20;
-                ket = "Order confirmed";
-            } else if (current === 20) {
+                next = 10;
+                ket = "Order Confirmed";
+            } else if (current === 10) {
                 next = 40;
-                ket = "Material preparation";
+                ket = "Material Preparation";
             } else if (current === 40) {
-                next = 60;
-                ket = "Installation in progress";
-            } else if (current === 60) {
                 next = 80;
-                ket = "Quality check";
+                ket = "Sewing and Manufacturing Process";
             } else if (current === 80) {
+                next = 90;
+                ket = "Installation & Quality Check";
+            } else if (current === 90) {
                 next = 100;
                 ket = "Ready for pick up";
             } else {
