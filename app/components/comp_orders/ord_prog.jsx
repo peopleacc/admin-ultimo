@@ -24,7 +24,7 @@ export default function OrdProg() {
                     m_teknisi(*)
                 )
             `)
-            .in("t_pemesanan.status_pengerjaan", ["proses", "Menunggu Pembayaran"])
+            .in("t_pemesanan.status_pengerjaan", ["proses", "Waiting For Payment"])
             .order("presentase_progress", { ascending: false });
 
         if (error) {
@@ -155,7 +155,7 @@ export default function OrdProg() {
                 />
             )}
 
-            {modalOpen && modalOpen.t_pemesanan?.status_pengerjaan === "Menunggu Pembayaran" && (
+            {modalOpen && modalOpen.t_pemesanan?.status_pengerjaan === "Waiting For Payment" && (
                 <Modal_confr
                     isOpen={true}
                     onClose={() => setModalOpen(null)}
@@ -164,7 +164,7 @@ export default function OrdProg() {
                 />
             )}
 
-            {modalOpen && !["proses", "Menunggu Pembayaran"].includes(
+            {modalOpen && !["proses", "Waiting For Payment"].includes(
                 modalOpen.t_pemesanan?.status_pengerjaan
             ) && (
                     <ModalCancel

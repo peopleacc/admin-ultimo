@@ -26,7 +26,7 @@ export default function Modalprog({ isOpen, onClose, order, onUpdated }) {
             // 1️⃣ Update status pesanan
             const { error: updateError } = await supabase
                 .from("t_pemesanan")
-                .update({ status_pengerjaan: "Menunggu Pembayaran" })
+                .update({ status_pengerjaan: "Waiting For Payment" })
                 .eq("pesanan_id", order.t_pemesanan?.pesanan_id);
 
             if (updateError) throw updateError;
@@ -54,16 +54,19 @@ export default function Modalprog({ isOpen, onClose, order, onUpdated }) {
 
             if (current === 0) {
                 next = 10;
-                ket = "Order Confirmed";
+                ket = "Car Inspection";
             } else if (current === 10) {
-                next = 40;
-                ket = "Material Preparation";
-            } else if (current === 40) {
+                next = 30;
+                ket = "Demolition";
+            } else if (current === 30) {
+                next = 60;
+                ket = "Making A Pattern";
+            } else if (current === 60) {
                 next = 80;
-                ket = "Sewing and Manufacturing Process";
+                ket = "Stitches";
             } else if (current === 80) {
                 next = 90;
-                ket = "Installation & Quality Check";
+                ket = "Finishing";
             } else if (current === 90) {
                 next = 100;
                 ket = "Ready for pick up";

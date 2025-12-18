@@ -6,7 +6,7 @@ export async function GET() {
         // 1. Get monthly revenue data
         const { data: orders, error: ordersError } = await supabase
             .from('t_pemesanan')
-            .select('total_estimasi_harga, created_at, status_pengerjaan, status_pembayaran');
+            .select('total_estimasi_harga, create_at, status_pengerjaan, status_pembayaran');
 
         if (ordersError) throw ordersError;
 
@@ -23,7 +23,7 @@ export async function GET() {
         const statusCount = { pending: 0, waiting: 0, proses: 0, selesai: 0, cancel: 0 };
 
         orders?.forEach(order => {
-            const date = new Date(order.created_at);
+            const date = new Date(order.create_at);
             const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
 
             // Revenue per month

@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function StatsCards() {
+    const router = useRouter();
     const [stats, setStats] = useState({
         totalOrders: 0,
         pending: 0,
@@ -68,7 +70,8 @@ export default function StatsCards() {
             cardBg: "bg-white",
             borderColor: "border-blue-200",
             textColor: "text-blue-900",
-            subtextColor: "text-blue-600"
+            subtextColor: "text-blue-600",
+            filter: "all"
         },
         {
             title: "Pending",
@@ -78,7 +81,8 @@ export default function StatsCards() {
             cardBg: "bg-white",
             borderColor: "border-amber-200",
             textColor: "text-amber-900",
-            subtextColor: "text-amber-600"
+            subtextColor: "text-amber-600",
+            filter: "pending"
         },
         {
             title: "Completed",
@@ -88,7 +92,8 @@ export default function StatsCards() {
             cardBg: "bg-white",
             borderColor: "border-emerald-200",
             textColor: "text-emerald-900",
-            subtextColor: "text-emerald-600"
+            subtextColor: "text-emerald-600",
+            filter: "completed"
         },
         {
             title: "Revenue",
@@ -99,9 +104,14 @@ export default function StatsCards() {
             borderColor: "border-purple-200",
             textColor: "text-purple-900",
             subtextColor: "text-purple-600",
-            isRevenue: true
+            isRevenue: true,
+            filter: "revenue"
         }
     ];
+
+    const handleCardClick = (filter) => {
+        router.push(`/dashboard/report?filter=${filter}`);
+    };
 
     if (loading) {
         return (
@@ -126,7 +136,8 @@ export default function StatsCards() {
             {cards.map((card, index) => (
                 <div
                     key={index}
-                    className={`${card.cardBg} rounded-xl p-5 shadow-md hover:shadow-lg transition-all duration-300 border ${card.borderColor} hover:-translate-y-0.5`}
+                    onClick={() => handleCardClick(card.filter)}
+                    className={`${card.cardBg} rounded-xl p-5 shadow-md hover:shadow-lg transition-all duration-300 border ${card.borderColor} hover:-translate-y-0.5 cursor-pointer`}
                 >
                     <div className="flex items-center gap-3">
                         {/* Icon */}
@@ -143,9 +154,13 @@ export default function StatsCards() {
                                 {card.value}
                             </p>
                         </div>
+
+                        {/* Arrow indicator */}
+                        <i className="bi bi-chevron-right text-gray-400"></i>
                     </div>
                 </div>
             ))}
         </div>
     );
 }
+
