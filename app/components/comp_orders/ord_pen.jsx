@@ -10,9 +10,11 @@ export default function OrdPen() {
   const [errorMsg, setErrorMsg] = useState("");
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedCancel, setSelectedCancel] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // 🔥 FETCH DATA PEMESANAN
   const fetchOrders = async () => {
+    setIsRefreshing(true);
     const { data, error } = await supabase
       .from("t_pemesanan")
       .select(`
@@ -31,11 +33,34 @@ export default function OrdPen() {
     } else {
       setOrders(data || []);
     }
+    setIsRefreshing(false);
   };
 
-  // 🔥 LOAD DATA SAAT AWAL
+  // 🔥 LOAD DATA SAAT AWAL + SETUP REALTIME SUBSCRIPTION
   useEffect(() => {
     fetchOrders();
+
+    // 🔥 REALTIME SUBSCRIPTION - Auto refresh saat ada perubahan data
+    const channel = supabase
+      .channel('ord_pen_realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Mendengarkan INSERT, UPDATE, DELETE
+          schema: 'public',
+          table: 't_pemesanan'
+        },
+        (payload) => {
+          console.log('📡 Realtime update received:', payload);
+          fetchOrders(); // Refresh data saat ada perubahan
+        }
+      )
+      .subscribe();
+
+    // Cleanup subscription saat component unmount
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   if (errorMsg) {
@@ -49,17 +74,26 @@ export default function OrdPen() {
   return (
     <div className="p-4 bg-white rounded-xl shadow-md">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">
-          Recent Orders
-        </h2>
+        <div className="flex items-center gap-3">
+          <h2 className="text-xl font-semibold text-gray-800">
+            Recent Orders
+          </h2>
+          {/* Live indicator */}
+          <span className="flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+            Live
+          </span>
+        </div>
         <button
           onClick={fetchOrders}
-          className="flex items-center gap-1 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition"
+          disabled={isRefreshing}
+          className={`flex items-center gap-1 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition ${isRefreshing ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
-          <i className="bi bi-arrow-clockwise text-lg"></i>
-          Refresh
+          <i className={`bi bi-arrow-clockwise text-lg ${isRefreshing ? 'animate-spin' : ''}`}></i>
+          {isRefreshing ? 'Refreshing...' : 'Refresh'}
         </button>
       </div>
+
 
 
       {orders.map((order) => (
